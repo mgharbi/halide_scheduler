@@ -16,10 +16,12 @@ import scheduler.dataset as dataset
 import torchlib.viz as viz
 
 def main(args):
-  bs = 8
-  ndimensions = 1
-  length = 8
-  nlayers = 5
+  bs = args.batch_size
+  ndimensions = args.ndims
+  length = args.pipeline_length
+
+  # RNN metaparams
+  nlayers = 3
   state_size = 128
 
   data = dataset.PipelineDataset(length, ndimensions)
@@ -31,14 +33,13 @@ def main(args):
   params = [p for p in rnn.parameters()]
   params += [p for p in cost_predictor.parameters()]
 
-  # criterion = nn.MSELoss()
   criterion = nn.L1Loss()
   opt = th.optim.Adam(params, lr=1e-4)
 
   rel = modules.RelativeError()
 
-  loss_viz = viz.ScalarVisualizer("loss")
-  rel_viz = viz.ScalarVisualizer("relative_error")
+  loss_viz = viz.ScalarVisualizer("loss", env="scheduler")
+  rel_viz = viz.ScalarVisualizer("relative_error", env="scheduler")
 
   smoothed_loss = 0
   smoothed_rel_err = 0
@@ -80,6 +81,10 @@ def main(args):
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
+  parser.add_argument("--batch_size", type=int, default=64)
+  parser.add_argument("--ndims", type=int, default=3)
+  parser.add_argument("--pipeline_length", type=int, default=8)
+  parser.add_argument("--lr", type=float, default=1e-4)
   parser.add_argument("--cuda", dest="cuda", action="store_true")
   parser.set_defaults(cuda=False)
   args = parser.parse_args()
