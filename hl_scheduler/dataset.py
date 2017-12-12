@@ -9,21 +9,21 @@ class PipelineDataset(Dataset):
     self.ndimensions = ndimensions
 
   def __len__(self):
-    return 32*500
+    return 32*5000
 
   def __getitem__(self, idx):
-    tile_sizes = np.random.uniform(1, 5, size=(self.length, self.ndimensions)).astype(np.float32)
-    # tile_sizes = np.random.randint(1, 5, size=(self.length, self.ndimensions)).astype(np.float32)
+    tile_sizes = np.random.randint(1, 5, size=(self.length, self.ndimensions)).astype(np.float32)
     inline_or_root = np.random.randint(0, 2, size=(self.length, 1)).astype(np.float32)
-    # pipeline_features = np.concatenate([tile_sizes, inline_or_root], axis=1)
 
     masked = tile_sizes*inline_or_root
     prod = np.product(masked, axis=1)
     cost = np.sum(prod)
-
-    cost = cost.astype(np.float32)
+    cost = np.expand_dims(cost, 1)
 
     features = np.concatenate([tile_sizes, inline_or_root], 1)
+
+    features = features.astype(np.float32)
+    cost = cost.astype(np.float32)
 
     # [time/depth, nfeatures]
     return features, cost
