@@ -11,6 +11,10 @@ git submodule update --recursive
 ```
 ### Launch visdom server
 
+```
+python -m 'visdom.server'
+```
+
 ### Run
 
 ```
